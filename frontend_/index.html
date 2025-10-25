@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="https://cdn-icons-png.flaticon.com/512/1037/1037762.png"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <title>Restaurant Website</title>
+</head>
+<body>
+    <div class="content">
+        <!-- Start header section -->
+        <div class="header" id="header">
+            <nav>
+                <img src="logo-dark.png" alt="Logo" class="logo" />
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#special">Special</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#events">Events</a></li>
+                    <li><a href="#contact-us">Contact Us</a></li>
+                </ul>
+                <i class="fa-solid fa-bars"></i>
+            </nav>
+        </div>
+        <!-- End header section -->
+
+        <!-- Start home section -->
+        <section class="home" id="home">
+            <div class="content">
+                <h2>IT IS A GOOD TIME FOR THE GREATEST TASTE OF BURGER</h2>
+                <p>BURGER <span>WEEK</span></p>
+            </div>
+            <img src="header.png" alt="Burger Header" draggable="false" />
+        </section>
+        <!-- End home section -->
+
+        <!-- Start special section -->
+        <section class="special" id="special">
+            <div class="card">
+                <p>TRY IT OUT TODAY</p>
+                <h4>MOST POPULAR BURGER</h4>
+            </div>
+            <div class="card">
+                <p>TRY IT OUT TODAY</p>
+                <h4>MORE FUN<br/>MORE TASTE</h4>
+            </div>
+            <div class="card">
+                <p>TRY IT OUT TODAY</p>
+                <h4>FRESH & CHILLI</h4>
+            </div>
+        </section>
+        <!-- End special section -->
+
+        <!-- Start menu section -->
+        <section class="menu" id="menu">
+            <p>ALWAYS TASTY BURGER</p>
+            <h1>CHOOSE & ENJOY</h1>
+            <span>
+                Whether you crave classic flavors or daring combinations, this is
+                where your culinary journey begins. Indulge your cravings and savor
+                every bite as you create your personalized burger experience with
+                Burger Company.
+            </span>
+            <div class="cards">
+                <div class="card">
+                    <img src="order-1.png" alt="Chicken Burger" draggable="false" />
+                    <h2>Chicken Burger</h2>
+                    <p>
+                        Sink your teeth into the timeless perfection of our Chicken
+                        Burger, an experience that never goes out of style.
+                    </p>
+                    <button>ORDER NOW</button>
+                </div>
+                <div class="card">
+                    <img src="order-2.png" alt="Veggie Delight Burger" draggable="false" />
+                    <h2>Veggie Delight Burger</h2>
+                    <p>
+                        Embrace the vibrant flavors of our Veggie Delight Burger, a
+                        celebration of freshness and wholesome goodness.
+                    </p>
+                    <button>ORDER NOW</button>
+                </div>
+                <div class="card">
+                    <img src="order-3.png" alt="BBQ Bacon Burger" draggable="false" />
+                    <h2>BBQ Bacon Burger</h2>
+                    <p>
+                        Indulge in a symphony of smoky, savory flavors with our BBQ Bacon
+                        Burger, grilled and topped with crispy bacon.
+                    </p>
+                    <button>ORDER NOW</button>
+                </div>
+            </div>
+        </section>
+        <!-- End menu section -->
+
+        <!-- Start event section -->
+        <section class="event" id="events">
+            <div class="card">
+                <div class="details">
+                    <h2>Discover</h2>
+                    <h1>UPCOMING EVENTS</h1>
+                    <p>
+                        From exclusive burger tastings and chef collaborations to
+                        community outreach initiatives and seasonal celebrations, there's
+                        always something special on the horizon at Burger Company. Be the
+                        first to know about our upcoming events, promotions, and
+                        gatherings as we continue to bring joy and flavor to our cherished
+                        customers. Join us in creating memorable moments and delicious
+                        memories together!
+                    </p>
+                </div>
+                <img src="event.png" alt="Upcoming Events" draggable="false" />
+            </div>
+        </section>
+        <!-- End event section -->
+
+        <!-- Start contact us section -->
+        <section class="contactus" id="contact-us">
+            <h3>RESERVATION</h3>
+            <h1>BOOK YOUR TABLE</h1>
+            <form action="/book" method="post">
+                <input type="text" placeholder="NAME" name="name" />
+                <input type="email" placeholder="EMAIL" name="email" />
+                <input type="date" placeholder="DATE" name="date" />
+                <input type="time" placeholder="TIME" name="time" />
+                <input type="number" placeholder="PEOPLE" min="1" name="people" />
+                <button class="btn" type="submit">BOOK TABLE</button> <a href="view" style="color: black;">view</a> 
+            </form>
+        </section>
+        <!-- End contact us section -->
+
+        <!-- Start footer section -->
+        <section class="footer" id="footer">
+            <div class="content">
+                <img src="logo-white.png" alt="Logo" draggable="false" />
+                <div class="details">
+                    <p>
+                        Welcome to Burger Company, where passion for exceptional food and
+                        genuine hospitality come together. Our story is one of dedication
+                        to crafting the perfect burger experience, from sourcing the
+                        finest ingredients to delivering unparalleled taste in every bite.
+                    </p>
+                </div>
+                <div class="info">
+                    <p>
+                        <i class="fa-solid fa-location-dot"></i>Karunya, Coimbatore, 641114
+                    </p>
+                    <p><i class="fa-solid fa-envelope"></i>info@burgerhouse.com</p>
+                    <div class="social">
+                        <a href="#"> <i class="fa-brands fa-facebook"></i> </a>
+                        <a href="#"> <i class="fa-brands fa-instagram"></i> </a>
+                        <a href="#"> <i class="fa-brands fa-twitter"></i> </a>
+                        <a href="#"> <i class="fa-brands fa-linkedin"></i> </a>
+                    </div>
+                </div>
+                <p class="Copyright">
+                    Copyright © 2024 <a href="#">artist</a>. All rights reserved.
+                </p>
+            </div>
+        </section>
+        <!-- End footer section -->
+
+        <!-- Cart Modal -->
+        <div id="cartModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Your Cart</h2>
+                <div id="cartItems"></div>
+                <button id="checkoutButton">Proceed to Checkout</button>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Order Successful!</h2>
+                <p>Thank you for your order. Your burger will be ready soon!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="script.js">
+    </script>
+</body>
+</html>
