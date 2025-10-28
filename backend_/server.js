@@ -1,155 +1,143 @@
 require("dotenv").config();
 const http = require("http");
-const fs = require("fs");
-const path = require("path");
 const mongoose = require("mongoose");
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/burgerdb")
-    .then(() => console.log("DB Connected"))
-    .catch(err => console.error("DB Connection Error:", err));
+// ===============================
+// MongoDB Connection
+// ===============================
+const mongoURI =
+  process.env.MONGO_URI || "mongodb://mongo:27017/burgerdb"; // <-- IMPORTANT: Use 'mongo' from docker-compose
 
-// Define schema and model
+mongoose
+  .connect(mongoURI)
+  .then(() => console.log("✅ DB Connected"))
+  .catch((err) => console.error("❌ DB Connection Error:", err.message));
+
+// ===============================
+// Define Schemas and Models
+// ===============================
+
+// Old schema (so /view still works)
 const customerSchema = new mongoose.Schema({
-    name: String,
-    email: String,
-    date: String,
-    time: String,
-    people: String
+  name: String,
+  email: String,
+  date: String,
+  time: String,
+  people: String,
 });
-const customerModel = mongoose.model('burgerbookings', customerSchema);
+const customerModel = mongoose.model("burgerbookings", customerSchema);
 
-// Create server
-const server = http.createServer((req, res) => {
-    let filePath;
+// NEW schema for the cart
+const orderSchema = new mongoose.Schema({
+  items: [String], // An array of burger names
+  orderDate: { type: Date, default: Date.now },
+});
+const orderModel = mongoose.model("orders", orderSchema);
 
-    // Serve index.html from frontend_ folder
-    if (req.url === "/") {
-        filePath = path.join(__dirname, "../frontend_", "index.html");
-    } else {
-        filePath = path.join(__dirname, "../frontend_", req.url);
+// ===============================
+// HTTP Server Setup
+// ===============================
+const server = http.createServer(async (req, res) => {
+  // --- START OF CORS HEADERS ---
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Allows all domains
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+  // --- END OF CORS HEADERS ---
+
+  // ===============================
+  // NEW Route: POST /order
+  // ===============================
+  if (req.url === "/order" && req.method === "POST") {
+    try {
+      let body = "";
+      req.on("data", (chunk) => (body += chunk.toString()));
+
+      req.on("end", async () => {
+        const { items } = JSON.parse(body); // Parse the JSON from the cart
+        const newOrder = new orderModel({ items });
+        await newOrder.save();
+
+        console.log("✅ Order saved:", items);
+
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ message: "Order saved successfully!" }));
+      });
+    } catch (err) {
+      console.error("❌ Error saving order:", err);
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Unable to save order." }));
     }
+    return;
+  }
 
-    const extname = path.extname(filePath).toLowerCase();
-    const mimeTypes = {
-        ".html": "text/html",
-        ".js": "text/javascript",
-        ".css": "text/css",
-        ".json": "application/json",
-        ".png": "image/png",
-        ".jpg": "image/jpg",
-        ".jpeg": "image/jpeg",
-        ".gif": "image/gif",
-        ".mp4": "video/mp4"
-    };
-    const contentType = mimeTypes[extname] || "text/html";
-
-    // Handle POST /book
-    if (req.url === "/book" && req.method === "POST") {
-        let body = "";
-        req.on("data", chunk => body += chunk.toString());
-        req.on("end", () => {
-            const formData = new URLSearchParams(body);
-            const booking = {
-                name: formData.get("name"),
-                email: formData.get("email"),
-                date: formData.get("date"),
-                time: formData.get("time"),
-                people: formData.get("people")
-            };
-
-            customerModel.create(booking)
-                .then(() => {
-                    console.log("Booking saved:", booking);
-                    res.writeHead(200, { "Content-Type": "text/html" });
-                    res.end(`
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Booking Confirmation</title>
-                            <style>
-                                body {
-                                    font-family: Arial, sans-serif;
-                                    background-color: #f4f4f4;
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: center;
-                                    justify-content: center;
-                                    height: 100vh;
-                                    margin: 0;
-                                }
-                                h1 { color: #4CAF50; }
-                                p { font-size: 1.2em; margin: 5px 0; }
-                                a {
-                                    text-decoration: none;
-                                    color: white;
-                                    background-color: #4CAF50;
-                                    padding: 10px 20px;
-                                    border-radius: 5px;
-                                }
-                                a:hover { background-color: #45a049; }
-                            </style>
-                        </head>
-                        <body>
-                            <h1>Thank You for Your Booking!</h1>
-                            <p>Name: ${booking.name}</p>
-                            <p>Email: ${booking.email}</p>
-                            <p>Date: ${booking.date}</p>
-                            <p>Time: ${booking.time}</p>
-                            <p>People: ${booking.people}</p>
-                            <a href="/">Go Back</a>
-                        </body>
-                        </html>
-                    `);
-                })
-                .catch(err => {
-                    console.error("Error saving booking:", err);
-                    res.writeHead(500, { "Content-Type": "text/html" });
-                    res.end("<h1>Internal Server Error</h1><p>Unable to save booking.</p>");
-                });
-        });
-        return;
+  // ===============================
+  // Route: GET /view (Display all OLD bookings)
+  // ===============================
+  if (req.url === "/view" && req.method === "GET") {
+    try {
+      const customers = await customerModel.find();
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write("<h1>All Bookings (Old System)</h1>");
+      res.write("<table border=1 cellspacing=0 width=600>");
+      res.write("<tr><th>Name</th><th>Email</th><th>Date</th><th>Time</th><th>People</th></tr>");
+      customers.forEach((c) => {
+        res.write(
+          `<tr><td>${c.name}</td><td>${c.email}</td><td>${c.date}</td><td>${c.time}</td><td>${c.people}</td></tr>`
+        );
+      });
+      res.write("</table>");
+      res.end();
+    } catch (err) {
+      console.error("❌ Error fetching bookings:", err);
+      res.writeHead(500, { "Content-Type": "text/html" });
+      res.end("<h1>500 Internal Server Error</h1><p>Unable to fetch bookings.</p>");
     }
+    return;
+  }
 
-    // Handle GET /view
-    if (req.url === "/view" && req.method === "GET") {
-        customerModel.find().then(customers => {
-            res.writeHead(200, { "Content-Type": "text/html" });
-            res.write("<h1>All Bookings</h1>");
-            res.write("<table border=1 cellspacing=0 width=600>");
-            res.write("<tr><th>Name</th><th>Email</th><th>Date</th><th>Time</th><th>People</th></tr>");
-            customers.forEach(c => {
-                res.write(`<tr><td>${c.name}</td><td>${c.email}</td><td>${c.date}</td><td>${c.time}</td><td>${c.people}</td></tr>`);
-            });
-            res.write("</table>");
-            res.end();
-        }).catch(err => {
-            console.error("Error fetching bookings:", err);
-            res.writeHead(500, { "Content-Type": "text/html" });
-            res.end("<h1>Internal Server Error</h1><p>Unable to fetch bookings.</p>");
-        });
-        return;
+  // ===============================
+  // (Optional) NEW Route: GET /view-orders
+  // ===============================
+  if (req.url === "/view-orders" && req.method === "GET") {
+    try {
+      const orders = await orderModel.find().sort({orderDate: -1});
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write("<h1>All New Burger Orders</h1>");
+      res.write("<table border=1 cellspacing=0 width=600>");
+      res.write("<tr><th>Order Date</th><th>Items</th></tr>");
+      orders.forEach((o) => {
+        res.write(
+          `<tr><td>${o.orderDate.toLocaleString()}</td><td>${o.items.join(", ")}</td></tr>`
+        );
+      });
+      res.write("</table>");
+      res.end();
+    } catch (err) {
+      console.error("❌ Error fetching orders:", err);
+      res.writeHead(500, { "Content-Type": "text/html" });
+      res.end("<h1>500 Internal Server Error</h1><p>Unable to fetch orders.</p>");
     }
+    return;
+  }
 
-    // Serve static files
-    fs.readFile(filePath, (err, content) => {
-        if (err) {
-            if (err.code === "ENOENT") {
-                res.writeHead(404, { "Content-Type": "text/html" });
-                res.end("<h1>404 Not Found</h1>");
-            } else {
-                res.writeHead(500, { "Content-Type": "text/plain" });
-                res.end(`Server Error: ${err.code}`);
-            }
-        } else {
-            res.writeHead(200, { "Content-Type": contentType });
-            res.end(content, "utf-8");
-        }
-    });
+
+  // ===============================
+  // Default 404 Route
+  // ===============================
+  res.writeHead(404, { "Content-Type": "text/html" });
+  res.end("<h1>404 Not Found</h1><p>This is the API server. The requested route was not found.</p>");
 });
 
+// ===============================
+// Start Server
+// ===============================
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 API Server running on http://localhost:${PORT}`);
 });

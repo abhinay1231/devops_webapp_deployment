@@ -1,4 +1,4 @@
-        const logo = document.querySelector(".logo");
+const logo = document.querySelector(".logo");
         const menu = document.querySelector(".fa-bars");
         const links = document.querySelector("nav ul");
 
@@ -97,13 +97,40 @@
             }
         }
 
+        // --- START OF MODIFICATION ---
         // Function to handle order success
-        function handleCheckout() {
-            hideModal(cartModal);
-            successModal.style.display = "block";
-            cart.length = 0; // Clear the cart after successful order
-            renderCart(); // Update cart display
+        async function handleCheckout() {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            try {
+                // This is the new fetch call, just like in Step 2
+                // It sends the cart data to a new /order endpoint on our backend
+                const response = await fetch('http://localhost:5000/order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ items: cart }), // Send the cart items
+                });
+
+                if (response.ok) {
+                    // Only show success if the backend confirms
+                    hideModal(cartModal);
+                    successModal.style.display = "block";
+                    cart.length = 0; // Clear the cart
+                    renderCart(); // Update cart display
+                } else {
+                    alert('There was a problem with your order. Please try again.');
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('Could not connect to the server. Please try again later.');
+            }
         }
+        // --- END OF MODIFICATION ---
 
         // Event listener for order buttons
         document.querySelectorAll(".menu .card button").forEach(button => {
@@ -141,4 +168,3 @@
                 hideModal(successModal);
             }
         };
-        
