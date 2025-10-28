@@ -18,7 +18,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          dockerfile: backend_/Dockerfile
+          file: backend_/Dockerfile  # <-- 1. This is now 'file:'
           push: false
           tags: burger-house-backend:latest
 
@@ -34,7 +34,7 @@ jobs:
       - name: Build frontend image
         uses: docker/build-push-action@v4
         with:
-          context: ./frontend_
-          dockerfile: ./frontend_/Dockerfile
+          context: .  # <-- 2. Changed context to root
+          file: frontend_/Dockerfile # <-- 3. Changed to 'file:' and fixed path
           push: false
           tags: burger-house-frontend:latest
