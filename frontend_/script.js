@@ -106,8 +106,7 @@ const logo = document.querySelector(".logo");
             }
 
             try {
-                // This is the new fetch call, just like in Step 2
-                // It sends the cart data to a new /order endpoint on our backend
+                // This is the fetch call with the correct, absolute URL
                 const response = await fetch('http://localhost:5000/order', {
                     method: 'POST',
                     headers: {
