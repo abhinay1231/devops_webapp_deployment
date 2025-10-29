@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:latest # Official image, no login needed
+        ports:
+        - containerPort: 27017
+        # Note: For real production, we'd use a PersistentVolume.
+        # For this local test, the data will be lost if the pod restarts.
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service # This is the crucial part
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
